@@ -1,0 +1,155 @@
+#include <LiquidCrystal.h>
+// C++ code
+//
+LiquidCrystal lcd (2, 3, 4, 5, 6, 7);
+int echo = 13;
+int trig = 12;
+int rLed = 11;
+int yLed = 10;
+int gLed = 9;
+int buzz = 8;
+int s1 = A0;
+long duration;
+long distance;
+int input1 = 1;
+int input2 = 2;
+int input3 = 3;
+
+void setup()
+{
+  lcd.begin(16,2);
+  Serial.begin(9600);
+  pinMode(echo, INPUT);
+  pinMode(trig, OUTPUT);
+  pinMode(rLed, OUTPUT);
+  pinMode(yLed, OUTPUT);
+  pinMode(gLed, OUTPUT);
+  pinMode(buzz, OUTPUT);
+  pinMode(s1, OUTPUT);
+}
+
+void loop()
+{
+  int begin;
+  begin = analogRead(s1);
+  if (begin == LOW) 
+  {
+    lcd.noDisplay();
+ 	digitalWrite(rLed, LOW);
+ 	digitalWrite(yLed, LOW);
+ 	digitalWrite(gLed, LOW);
+    digitalWrite(buzz, LOW);
+    
+  }
+  else {
+     lcd.display();
+ 	 digitalWrite(trig, LOW);
+ 	 delayMicroseconds(2);
+ 	 digitalWrite(trig, HIGH);
+  	 delayMicroseconds(5);
+   	 digitalWrite(trig, LOW);
+  
+  	 duration = pulseIn(echo,HIGH);
+     //our measurement is in centimeters
+     distance = (duration *0.034/2);
+  
+  	 if (distance <= 20){
+ 	 lcd.setCursor(0,0);
+  	 lcd.print("Distance: ");
+  	 lcd.print(distance);
+  	 lcd.print("cm");
+ 	 lcd.setCursor(0,1);
+ 	 lcd.print("Red Alert!!!");
+ 	 digitalWrite(rLed, HIGH);
+ 	 digitalWrite(yLed, LOW);
+ 	 digitalWrite(gLed, LOW);
+ 	 settone(input1);
+	 }
+
+	 else if (distance > 20 && distance <= 50) {
+	 lcd.setCursor(0,0);
+ 	 lcd.print("Distance: ");
+ 	 lcd.print(distance);
+ 	 lcd.print("cm");
+ 	 lcd.setCursor(0,1);
+ 	 lcd.print("Caution!!");
+ 	 digitalWrite(rLed, LOW);
+ 	 digitalWrite(yLed, HIGH);
+ 	 digitalWrite(gLed, LOW);
+ 	 settone(input3);
+ 	 }
+ 
+ 	 else if (distance > 50 && distance <= 100) {
+ 	 lcd.setCursor(0,0);
+ 	 lcd.print("Distance: ");
+ 	 lcd.print(distance);
+ 	 lcd.print("cm");
+ 	 lcd.setCursor(0,1);
+ 	 lcd.print("Warning!");
+ 	 digitalWrite(rLed, LOW);
+ 	 digitalWrite(yLed, LOW);
+ 	 digitalWrite(gLed, HIGH);
+ 	 settone(input2);
+ 	 } 
+  
+ 	 else {
+ 	 digitalWrite(rLed, LOW);
+ 	 digitalWrite(yLed, LOW);
+ 	 digitalWrite(gLed, LOW);
+	 digitalWrite(buzz, LOW);
+	 lcd.setCursor(0,0);
+ 	 lcd.print("Distance: ");
+ 	 lcd.print(distance);
+ 	 lcd.print("cm");
+ 	 lcd.setCursor(0,1);
+ 	 lcd.print("Be Aware"); 
+ 	 delay(1000);
+ 	 }
+  }
+  
+}
+
+void settone(int input){
+if(input == 1)
+  one();
+else if(input == 2)
+  two();
+else if(input == 3)
+  three();
+}
+
+void one() {
+ for(int hz = 440; hz < 1000; hz+=25){
+    tone(buzz, hz, 50);
+    delay(5);
+ 	}
+ for(int hz = 1000; hz > 440; hz-=25){
+    tone(buzz, hz, 50);
+    delay(5);
+ }
+}
+
+void two(){
+ tone(buzz,440,200);
+ delay(100);
+ noTone(buzz);
+ tone(buzz,494,500);
+ delay(300);
+ noTone(buzz);
+ tone(buzz,523,300);
+ delay(300);
+ noTone(buzz);
+}
+
+void three(){
+for(int hz = 440; hz < 1000; hz++){
+    tone(buzz, hz, 50);
+    delay(5);
+	}
+for(int hz = 1000; hz > 440; hz--){
+    tone(buzz, hz, 50);
+    delay(5);
+    }
+  
+}
+     
